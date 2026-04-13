@@ -22,7 +22,7 @@ export class DustParticles {
   private bounds = { x: 0.5, y: 0.35, z: 0.5 };
   private time = 0;
 
-  constructor(scene: Scene, count = 120) {
+  constructor(scene: Scene, count = 300) {
     this.count = count;
 
     this.positions = new Float32Array(count * 3);
@@ -45,11 +45,11 @@ export class DustParticles {
     const texture = this.createDustTexture();
 
     const material = new PointsMaterial({
-      size: 0.007,
+      size: 0.005,
       sizeAttenuation: true,
       color: new Color(0xfff5e0),
       transparent: true,
-      opacity: 0.28,
+      opacity: 0.10,
       blending: AdditiveBlending,
       depthWrite: false,
       map: texture,

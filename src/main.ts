@@ -90,7 +90,7 @@ class App {
     new LightingRig(this.scene);
 
     // Atmospheric dust particles
-    this.dustParticles = new DustParticles(this.scene, 100);
+    this.dustParticles = new DustParticles(this.scene, 160);
 
     // Materials
     this.materialSwapper = new MaterialSwapper();

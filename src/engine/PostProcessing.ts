@@ -12,6 +12,7 @@ import {
   ChromaticAberrationEffect,
   NoiseEffect,
   BlendFunction,
+  DepthOfFieldEffect,
 } from 'postprocessing';
 
 export class PostProcessingPipeline {
@@ -55,9 +56,17 @@ export class PostProcessingPipeline {
     });
     noiseEffect.blendMode.opacity.value = 0.22;
 
+    // Depth of field — subtle cinematic bokeh
+    const dofEffect = new DepthOfFieldEffect(camera, {
+      focalLength: 0.06,
+      bokehScale: 1.2,
+      focusDistance: 0.0,
+    });
+
     // Main effects pass
     const effectPass = new EffectPass(
       camera,
+      dofEffect,
       bloomEffect,
       toneMappingEffect,
       vignetteEffect,

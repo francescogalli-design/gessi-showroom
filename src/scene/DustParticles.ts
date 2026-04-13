@@ -45,11 +45,11 @@ export class DustParticles {
     const texture = this.createDustTexture();
 
     const material = new PointsMaterial({
-      size: 0.003,
+      size: 0.007,
       sizeAttenuation: true,
       color: new Color(0xfff5e0),
       transparent: true,
-      opacity: 0.35,
+      opacity: 0.28,
       blending: AdditiveBlending,
       depthWrite: false,
       map: texture,
@@ -62,17 +62,19 @@ export class DustParticles {
 
   private createDustTexture(): CanvasTexture {
     const canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 32;
+    canvas.width = 64;
+    canvas.height = 64;
     const ctx = canvas.getContext('2d')!;
 
-    const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
-    gradient.addColorStop(0, 'rgba(255, 248, 230, 1)');
-    gradient.addColorStop(0.15, 'rgba(255, 245, 220, 0.8)');
-    gradient.addColorStop(0.5, 'rgba(255, 240, 210, 0.15)');
-    gradient.addColorStop(1, 'rgba(255, 240, 210, 0)');
+    // Very soft, large falloff — blurry dust mote look
+    const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gradient.addColorStop(0,    'rgba(255, 250, 240, 0.9)');
+    gradient.addColorStop(0.08, 'rgba(255, 248, 230, 0.6)');
+    gradient.addColorStop(0.3,  'rgba(255, 244, 220, 0.2)');
+    gradient.addColorStop(0.6,  'rgba(255, 240, 210, 0.05)');
+    gradient.addColorStop(1,    'rgba(255, 240, 210, 0)');
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 32, 32);
+    ctx.fillRect(0, 0, 64, 64);
 
     return new CanvasTexture(canvas);
   }

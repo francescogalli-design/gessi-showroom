@@ -76,12 +76,13 @@ class App {
     };
 
     // Load and apply the studio environment first
-    await this.environmentManager.loadEnvironment(ENVIRONMENTS[0]);
+    // Default: Studio Light (index 1)
+    await this.environmentManager.loadEnvironment(ENVIRONMENTS[1]);
     this.loadingScreen.setProgress(25, 'Loading environments...');
 
     // Preload remaining environments in background
-    for (let i = 1; i < ENVIRONMENTS.length; i++) {
-      this.environmentManager.preloadOnly(ENVIRONMENTS[i]);
+    for (let i = 0; i < ENVIRONMENTS.length; i++) {
+      if (i !== 1) this.environmentManager.preloadOnly(ENVIRONMENTS[i]);
     }
 
     this.loadingScreen.setProgress(35, 'Loading lighting...');
@@ -90,7 +91,7 @@ class App {
     new LightingRig(this.scene);
 
     // Atmospheric dust particles
-    this.dustParticles = new DustParticles(this.scene, 160);
+    this.dustParticles = new DustParticles(this.scene, 80);
 
     // Materials
     this.materialSwapper = new MaterialSwapper();

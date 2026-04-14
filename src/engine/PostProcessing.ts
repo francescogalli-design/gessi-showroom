@@ -54,7 +54,7 @@ export class PostProcessingPipeline {
     const noiseEffect = new NoiseEffect({
       blendFunction: BlendFunction.OVERLAY,
     });
-    noiseEffect.blendMode.opacity.value = 0.11;
+    noiseEffect.blendMode.opacity.value = 0.055;
 
     // Depth of field — subtle cinematic bokeh
     const dofEffect = new DepthOfFieldEffect(camera, {

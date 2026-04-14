@@ -104,7 +104,7 @@ export class UIOverlay {
             <div class="scene-list">
               ${ENVIRONMENTS.map(
                 (e, i) =>
-                  `<button class="scene-btn ${i === 0 ? 'active' : ''}" data-env="${e.id}">
+                  `<button class="scene-btn ${i === 1 ? 'active' : ''}" data-env="${e.id}">
                     <span class="scene-icon"></span>
                     ${e.name}
                   </button>`

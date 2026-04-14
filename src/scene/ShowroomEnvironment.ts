@@ -6,6 +6,7 @@ import {
   CylinderGeometry,
   LatheGeometry,
   MeshStandardMaterial,
+  MeshBasicMaterial,
   DoubleSide,
   Color,
   Vector2,
@@ -16,6 +17,8 @@ export class ShowroomEnvironment {
   public group: Group;
   private darkFloor!: Reflector;
   private lightFloor!: Reflector;
+  private darkVeil!: Mesh;
+  private lightVeil!: Mesh;
   private backdropGroup!: Group;
   private lightBackdropGroup!: Group;
 
@@ -39,11 +42,25 @@ export class ShowroomEnvironment {
       clipBias: 0.003,
       textureWidth: 1024,
       textureHeight: 1024,
-      color: new Color(0x070707),
+      color: new Color(0x030303),
     });
     this.darkFloor.rotation.x = -Math.PI / 2;
     this.darkFloor.position.y = -0.001;
     this.group.add(this.darkFloor);
+
+    // Glass veil — semi-transparent dark overlay to attenuate reflection
+    this.darkVeil = new Mesh(
+      new PlaneGeometry(5, 5),
+      new MeshBasicMaterial({
+        color: new Color(0x050505),
+        transparent: true,
+        opacity: 0.72,
+        depthWrite: false,
+      })
+    );
+    this.darkVeil.rotation.x = -Math.PI / 2;
+    this.darkVeil.position.y = 0.0001;
+    this.group.add(this.darkVeil);
   }
 
   private createLightFloor() {
@@ -52,11 +69,25 @@ export class ShowroomEnvironment {
       clipBias: 0.003,
       textureWidth: 1024,
       textureHeight: 1024,
-      color: new Color(0xe8e6e4),
+      color: new Color(0xd0cec8),
     });
     this.lightFloor.rotation.x = -Math.PI / 2;
     this.lightFloor.position.y = -0.001;
     this.group.add(this.lightFloor);
+
+    // Minimal veil on light floor — barely-there attenuation
+    this.lightVeil = new Mesh(
+      new PlaneGeometry(5, 5),
+      new MeshBasicMaterial({
+        color: new Color(0xfaf9f8),
+        transparent: true,
+        opacity: 0.18,
+        depthWrite: false,
+      })
+    );
+    this.lightVeil.rotation.x = -Math.PI / 2;
+    this.lightVeil.position.y = 0.0001;
+    this.group.add(this.lightVeil);
   }
 
   private createDarkBackdrop() {
@@ -150,7 +181,9 @@ export class ShowroomEnvironment {
 
   setMode(mode: 'dark' | 'light' | 'hidden') {
     this.darkFloor.visible = mode === 'dark';
+    this.darkVeil.visible = mode === 'dark';
     this.lightFloor.visible = mode === 'light';
+    this.lightVeil.visible = mode === 'light';
     this.backdropGroup.visible = mode === 'dark';
     this.lightBackdropGroup.visible = mode === 'light';
   }

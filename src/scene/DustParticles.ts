@@ -49,7 +49,7 @@ export class DustParticles {
       sizeAttenuation: true,
       color: new Color(0xfff5e0),
       transparent: true,
-      opacity: 0.10,
+      opacity: 0.05,
       blending: AdditiveBlending,
       depthWrite: false,
       map: texture,

@@ -75,13 +75,13 @@ export class ShowroomEnvironment {
     this.lightFloor.position.y = -0.001;
     this.group.add(this.lightFloor);
 
-    // Minimal veil on light floor — barely-there attenuation
+    // No veil on light floor — natural reflection is subtle enough
     this.lightVeil = new Mesh(
       new PlaneGeometry(5, 5),
       new MeshBasicMaterial({
         color: new Color(0xfaf9f8),
         transparent: true,
-        opacity: 0.18,
+        opacity: 0.0,
         depthWrite: false,
       })
     );

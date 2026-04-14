@@ -67,12 +67,18 @@ class App {
 
     // Connect environment changes to showroom mode
     this.environmentManager.onEnvironmentChange = (preset) => {
+      const isLight = !!preset.lightMode;
       if (preset.showAsBackground) {
         this.showroom.setVisible(false);
       } else {
         this.showroom.setVisible(true);
-        this.showroom.setMode(preset.lightMode ? 'light' : 'dark');
+        this.showroom.setMode(isLight ? 'light' : 'dark');
       }
+      // Exposure + DOF: light mode needs more contrast, less bokeh haze
+      this.renderer.instance.toneMappingExposure = isLight ? 1.3 : 0.8;
+      this.postProcessing.setBokeh(isLight ? 0.0 : 1.2);
+      // Sync UI theme
+      if (this.ui) this.ui.setTheme(isLight);
     };
 
     // Load and apply the studio environment first
@@ -137,6 +143,9 @@ class App {
     // Start
     this.loadingScreen.setProgress(100, 'Ready');
     this.loadingScreen.hide();
+    // Apply initial theme based on default environment (Studio Light)
+    const defaultEnv = ENVIRONMENTS[1];
+    this.ui.setTheme(!!defaultEnv.lightMode);
     setTimeout(() => this.ui.show(), 600);
 
     this.animate();

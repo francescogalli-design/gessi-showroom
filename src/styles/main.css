@@ -12,18 +12,107 @@
   --gold-glow: rgba(201, 160, 80, 0.12);
   --panel-bg: rgba(10, 10, 10, 0.85);
   --panel-border: rgba(255, 255, 255, 0.06);
+  --panel-section-border: rgba(255, 255, 255, 0.04);
   --text-primary: #fff;
   --text-secondary: rgba(255, 255, 255, 0.55);
   --text-muted: rgba(255, 255, 255, 0.3);
+  --logo-filter: invert(1);
+  --top-gradient: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 100%);
+  --bottom-gradient: linear-gradient(to top, rgba(0,0,0,0.0) 0%, transparent 100%);
   --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --transition-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================
+   LIGHT THEME — Studio Light environment
+   ============================================ */
+
+body.theme-light {
+  --panel-bg: rgba(252, 251, 250, 0.88);
+  --panel-border: rgba(0, 0, 0, 0.07);
+  --panel-section-border: rgba(0, 0, 0, 0.05);
+  --text-primary: #1a1a1a;
+  --text-secondary: rgba(0, 0, 0, 0.5);
+  --text-muted: rgba(0, 0, 0, 0.3);
+  --logo-filter: invert(0);
+  --top-gradient: linear-gradient(to bottom, rgba(250,249,248,0.6) 0%, transparent 100%);
+}
+
+body.theme-light .model-card {
+  background: rgba(0, 0, 0, 0.02);
+}
+body.theme-light .model-card:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+body.theme-light .model-card.active {
+  background: var(--gold-glow);
+}
+body.theme-light .scene-btn {
+  background: rgba(0, 0, 0, 0.02);
+}
+body.theme-light .scene-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+body.theme-light .scene-btn.active {
+  background: var(--gold-glow);
+}
+body.theme-light .camera-btn {
+  background: rgba(0, 0, 0, 0.02);
+}
+body.theme-light .camera-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+body.theme-light .bottom-controls {
+  background: rgba(252, 251, 250, 0.88);
+}
+body.theme-light .bottom-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+body.theme-light .bottom-separator {
+  background: rgba(0, 0, 0, 0.1);
+}
+body.theme-light .action-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+body.theme-light .panel-toggle {
+  background: rgba(252, 251, 250, 0.88);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+body.theme-light .panel-toggle:hover {
+  border-color: rgba(0, 0, 0, 0.18);
+}
+body.theme-light .exposure-slider {
+  background: rgba(0, 0, 0, 0.1);
+}
+body.theme-light .rfid-indicator {
+  background: rgba(252, 251, 250, 0.88);
+  border-color: rgba(0, 0, 0, 0.07);
+}
+body.theme-light .finish-badge {
+  border-color: rgba(201, 160, 80, 0.2);
+}
+body.theme-light .toast {
+  background: rgba(252, 251, 250, 0.92);
+  border-color: rgba(0, 0, 0, 0.07);
+}
+/* Smooth theme transition */
+body, #ui-overlay, .top-bar, .side-panel-inner,
+.bottom-controls, .panel-toggle, .rfid-indicator,
+.model-card, .scene-btn, .camera-btn, .action-btn,
+.finish-badge, .model-name, .model-category, .model-sku {
+  transition-property: background, border-color, color, filter;
+  transition-duration: 0.5s;
+  transition-timing-function: var(--transition-smooth);
 }
 
 html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #000;
+  background: #faf9f8;
   font-family: 'DM Sans', -apple-system, sans-serif;
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
@@ -50,7 +139,7 @@ canvas {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: #000;
+  background: #faf9f8;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -73,7 +162,7 @@ canvas {
 .loading-logo {
   height: 40px;
   width: auto;
-  filter: invert(1);
+  filter: invert(0);
 }
 
 .loading-bar-container {
@@ -96,8 +185,12 @@ canvas {
   font-weight: 300;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: rgba(0, 0, 0, 0.35);
   margin-top: 1.5rem;
+}
+
+.loading-bar-container {
+  background: rgba(0, 0, 0, 0.08);
 }
 
 /* ============================================
@@ -135,7 +228,7 @@ canvas {
   align-items: center;
   justify-content: space-between;
   padding: 0 2rem;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
+  background: var(--top-gradient);
 }
 
 .brand-container {
@@ -147,7 +240,7 @@ canvas {
 .brand-logo {
   height: 22px;
   width: auto;
-  filter: invert(1);
+  filter: var(--logo-filter);
   opacity: 0.9;
 }
 
@@ -391,7 +484,7 @@ canvas {
   color: var(--text-muted);
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--panel-section-border);
 }
 
 /* Model Grid */

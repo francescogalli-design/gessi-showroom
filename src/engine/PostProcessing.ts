@@ -17,6 +17,7 @@ import {
 
 export class PostProcessingPipeline {
   public composer: EffectComposer;
+  private dofEffect!: DepthOfFieldEffect;
 
   constructor(
     renderer: WebGLRenderer,
@@ -57,7 +58,7 @@ export class PostProcessingPipeline {
     noiseEffect.blendMode.opacity.value = 0.055;
 
     // Depth of field — subtle cinematic bokeh
-    const dofEffect = new DepthOfFieldEffect(camera, {
+    this.dofEffect = new DepthOfFieldEffect(camera, {
       focalLength: 0.06,
       bokehScale: 1.2,
       focusDistance: 0.0,
@@ -66,7 +67,7 @@ export class PostProcessingPipeline {
     // Main effects pass
     const effectPass = new EffectPass(
       camera,
-      dofEffect,
+      this.dofEffect,
       bloomEffect,
       toneMappingEffect,
       vignetteEffect,
@@ -89,6 +90,10 @@ export class PostProcessingPipeline {
     });
     const smaaPass = new EffectPass(camera, smaaEffect);
     this.composer.addPass(smaaPass);
+  }
+
+  setBokeh(scale: number) {
+    this.dofEffect.bokehScale = scale;
   }
 
   setSize(width: number, height: number) {

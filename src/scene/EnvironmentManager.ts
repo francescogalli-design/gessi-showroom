@@ -110,7 +110,7 @@ export class EnvironmentManager {
       this.scene.environmentIntensity = 1.0;
     } else if (preset.lightMode) {
       this.scene.background = new Color(0xfaf9f8);
-      this.scene.environmentIntensity = 0.35;
+      this.scene.environmentIntensity = 0.28;
     } else {
       this.scene.background = new Color(0x050505);
       this.scene.environmentIntensity = 0.25;

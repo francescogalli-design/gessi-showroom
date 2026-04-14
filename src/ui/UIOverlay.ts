@@ -348,6 +348,10 @@ export class UIOverlay {
     this.selectFinish(finishId);
   }
 
+  setTheme(light: boolean) {
+    document.body.classList.toggle('theme-light', light);
+  }
+
   showToast(message: string) {
     const existing = document.querySelector('.toast');
     if (existing) existing.remove();

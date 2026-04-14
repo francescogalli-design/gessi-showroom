@@ -6,7 +6,6 @@ import {
   CylinderGeometry,
   LatheGeometry,
   MeshStandardMaterial,
-  MeshBasicMaterial,
   DoubleSide,
   Color,
   Vector2,
@@ -17,8 +16,6 @@ export class ShowroomEnvironment {
   public group: Group;
   private darkFloor!: Reflector;
   private lightFloor!: Reflector;
-  private darkVeil!: Mesh;
-  private lightVeil!: Mesh;
   private backdropGroup!: Group;
   private lightBackdropGroup!: Group;
 
@@ -47,20 +44,6 @@ export class ShowroomEnvironment {
     this.darkFloor.rotation.x = -Math.PI / 2;
     this.darkFloor.position.y = -0.001;
     this.group.add(this.darkFloor);
-
-    // Glass veil — semi-transparent dark overlay to attenuate reflection
-    this.darkVeil = new Mesh(
-      new PlaneGeometry(5, 5),
-      new MeshBasicMaterial({
-        color: new Color(0x050505),
-        transparent: true,
-        opacity: 0.72,
-        depthWrite: false,
-      })
-    );
-    this.darkVeil.rotation.x = -Math.PI / 2;
-    this.darkVeil.position.y = 0.0001;
-    this.group.add(this.darkVeil);
   }
 
   private createLightFloor() {
@@ -74,20 +57,6 @@ export class ShowroomEnvironment {
     this.lightFloor.rotation.x = -Math.PI / 2;
     this.lightFloor.position.y = -0.001;
     this.group.add(this.lightFloor);
-
-    // No veil on light floor — natural reflection is subtle enough
-    this.lightVeil = new Mesh(
-      new PlaneGeometry(5, 5),
-      new MeshBasicMaterial({
-        color: new Color(0xfaf9f8),
-        transparent: true,
-        opacity: 0.0,
-        depthWrite: false,
-      })
-    );
-    this.lightVeil.rotation.x = -Math.PI / 2;
-    this.lightVeil.position.y = 0.0001;
-    this.group.add(this.lightVeil);
   }
 
   private createDarkBackdrop() {
@@ -181,9 +150,7 @@ export class ShowroomEnvironment {
 
   setMode(mode: 'dark' | 'light' | 'hidden') {
     this.darkFloor.visible = mode === 'dark';
-    this.darkVeil.visible = mode === 'dark';
     this.lightFloor.visible = mode === 'light';
-    this.lightVeil.visible = mode === 'light';
     this.backdropGroup.visible = mode === 'dark';
     this.lightBackdropGroup.visible = mode === 'light';
   }

@@ -13,7 +13,6 @@ import { MODELS } from './utils/AssetManifest';
 import { UIOverlay } from './ui/UIOverlay';
 import { LoadingScreen } from './ui/LoadingScreen';
 import { DustParticles } from './scene/DustParticles';
-import { LightBeam } from './scene/LightBeam';
 import { RfidService } from './services/RfidService';
 import './styles/main.css';
 
@@ -29,7 +28,6 @@ class App {
   private ui!: UIOverlay;
   private loadingScreen!: LoadingScreen;
   private dustParticles!: DustParticles;
-  private lightBeam!: LightBeam;
   private rfidService: RfidService | null = null;
   private clock = 0;
   private lastTime = performance.now();
@@ -101,8 +99,6 @@ class App {
     // Atmospheric dust particles
     this.dustParticles = new DustParticles(this.scene, 80);
 
-    // Cinematic light beam
-    this.lightBeam = new LightBeam(this.scene);
 
     // Materials
     this.materialSwapper = new MaterialSwapper();

@@ -33,7 +33,7 @@ export class CameraController {
   constructor(canvas: HTMLCanvasElement, container: HTMLElement) {
     const aspect = container.clientWidth / container.clientHeight;
     this.camera = new PerspectiveCamera(35, aspect, 0.001, 100);
-    this.camera.position.set(0.3, 0.18, 0.3);
+    this.camera.position.set(0.38, 0.22, 0.38);
 
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.enableDamping = true;

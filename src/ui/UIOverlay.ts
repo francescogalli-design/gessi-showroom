@@ -11,6 +11,8 @@ export interface UICallbacks {
   onAutoRotateToggle: (enabled: boolean) => void;
   onScreenshot: () => void;
   onFullscreen: () => void;
+  onBluetoothConnect: () => void;
+  onDayNightCycle: () => void;
 }
 
 export class UIOverlay {
@@ -42,6 +44,15 @@ export class UIOverlay {
           <div class="brand-sub">Virtual Showroom</div>
         </div>
         <div class="top-actions">
+          <button class="action-btn" id="btn-daynightcycle" title="Day / Golden Hour / Night">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <span class="tooltip">Light Cycle</span>
+          </button>
+          <button class="action-btn" id="btn-bluetooth" title="Connect NFC via Bluetooth">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"/></svg>
+            <span class="bt-led" id="bt-led"></span>
+            <span class="tooltip">Connect NFC</span>
+          </button>
           <button class="action-btn" id="btn-autorotate" title="Auto Rotate">
             <svg viewBox="0 0 24 24"><path d="M21.5 2v6h-6"/><path d="M21.34 13.72A10 10 0 1 1 18.57 4.53l2.93-2.53"/></svg>
             <span class="tooltip">Rotate</span>
@@ -136,24 +147,23 @@ export class UIOverlay {
       <div class="bottom-controls">
         ${FINISHES.map(
           (f, i) =>
-            `<button class="bottom-btn ${i === 0 ? 'active' : ''}" data-quick-finish="${f.id}" title="${f.name}">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="${f.swatchColor}" stroke="none"/></svg>
+            `<button class="finish-dot ${i === 0 ? 'active' : ''}" data-quick-finish="${f.id}" style="--swatch:${f.swatchColor}">
               <span class="tooltip">${f.name}</span>
             </button>`
         ).join('')}
         <div class="bottom-separator"></div>
         ${MODELS.map(
           (m, i) =>
-            `<button class="bottom-btn ${i === 0 ? 'active' : ''}" data-quick-model="${m.id}" title="${m.name}">
-              <svg viewBox="0 0 24 24"><text x="12" y="16" text-anchor="middle" fill="currentColor" stroke="none" font-size="12" font-family="DM Sans">${i + 1}</text></svg>
+            `<button class="model-dot ${i === 0 ? 'active' : ''}" data-quick-model="${m.id}">
               <span class="tooltip">${m.name}</span>
+              ${i + 1}
             </button>`
         ).join('')}
       </div>
 
       <div class="rfid-indicator" id="rfid-indicator">
         <span class="rfid-dot"></span>
-        <span class="rfid-label" id="rfid-label">RFID</span>
+        <span class="rfid-label" id="rfid-label">NFC</span>
       </div>
 
       <div class="kbd-hint">
@@ -161,6 +171,8 @@ export class UIOverlay {
         <div class="kbd-item"><span class="kbd-key">S</span><span class="kbd-desc">Screenshot</span></div>
         <div class="kbd-item"><span class="kbd-key">F</span><span class="kbd-desc">Fullscreen</span></div>
         <div class="kbd-item"><span class="kbd-key">P</span><span class="kbd-desc">Panel</span></div>
+        <div class="kbd-item"><span class="kbd-key">H</span><span class="kbd-desc">Hide UI</span></div>
+        <div class="kbd-item"><span class="kbd-key">N</span><span class="kbd-desc">Night Cycle</span></div>
       </div>
     `;
 
@@ -185,6 +197,16 @@ export class UIOverlay {
       this.autoRotate = !this.autoRotate;
       rotateBtn.classList.toggle('active', this.autoRotate);
       this.callbacks.onAutoRotateToggle(this.autoRotate);
+    });
+
+    // Day/Night cycle button
+    document.getElementById('btn-daynightcycle')!.addEventListener('click', () => {
+      this.callbacks.onDayNightCycle();
+    });
+
+    // Bluetooth NFC connect
+    document.getElementById('btn-bluetooth')!.addEventListener('click', () => {
+      this.callbacks.onBluetoothConnect();
     });
 
     // Screenshot
@@ -261,12 +283,10 @@ export class UIOverlay {
 
   private selectModel(id: string) {
     this.currentModelId = id;
-    // Update panel cards
     this.overlay.querySelectorAll('.model-card').forEach((c) => {
       c.classList.toggle('active', (c as HTMLElement).dataset.model === id);
     });
-    // Update bottom buttons
-    this.overlay.querySelectorAll('[data-quick-model]').forEach((b) => {
+    this.overlay.querySelectorAll('.model-dot').forEach((b) => {
       b.classList.toggle('active', (b as HTMLElement).dataset.quickModel === id);
     });
     this.callbacks.onModelSelect(id);
@@ -274,12 +294,10 @@ export class UIOverlay {
 
   private selectFinish(id: string) {
     this.currentFinishId = id;
-    // Update panel options
     this.overlay.querySelectorAll('.finish-option').forEach((o) => {
       o.classList.toggle('active', (o as HTMLElement).dataset.finish === id);
     });
-    // Update bottom buttons
-    this.overlay.querySelectorAll('[data-quick-finish]').forEach((b) => {
+    this.overlay.querySelectorAll('.finish-dot').forEach((b) => {
       b.classList.toggle('active', (b as HTMLElement).dataset.quickFinish === id);
     });
     this.callbacks.onFinishSelect(id);
@@ -311,12 +329,22 @@ export class UIOverlay {
         case 'p':
           this.togglePanel();
           break;
+        case 'h':
+          document.body.classList.toggle('ui-hidden');
+          break;
+        case 'n':
+          this.callbacks.onDayNightCycle();
+          break;
         case '1': case '2': case '3': case '4':
           const idx = parseInt(e.key) - 1;
           if (idx < MODELS.length) this.selectModel(MODELS[idx].id);
           break;
         case 'escape':
-          if (this.panelOpen) this.togglePanel();
+          if (document.body.classList.contains('ui-hidden')) {
+            document.body.classList.remove('ui-hidden');
+          } else if (this.panelOpen) {
+            this.togglePanel();
+          }
           break;
       }
     });
@@ -333,14 +361,26 @@ export class UIOverlay {
     this.finishBadgeDot.style.background = finish.swatchColor;
   }
 
-  /** Called by RFID service to update indicator */
-  setRfidStatus(connected: boolean, label?: string) {
-    const el = document.getElementById('rfid-indicator')!;
-    el.classList.toggle('visible', true);
-    el.classList.toggle('connected', connected);
+  /** Called by Bluetooth NFC service to update indicator + top-bar LED */
+  setRfidStatus(connected: boolean, label?: string, connecting = false) {
+    const indicator = document.getElementById('rfid-indicator')!;
+    indicator.classList.add('visible');
+    indicator.classList.toggle('connected', connected);
+    indicator.classList.toggle('connecting', connecting && !connected);
     if (label) {
       document.getElementById('rfid-label')!.textContent = label;
     }
+
+    // Top-bar BT LED
+    const led = document.getElementById('bt-led');
+    if (led) {
+      led.classList.toggle('bt-led--connecting', connecting && !connected);
+      led.classList.toggle('bt-led--connected', connected);
+      led.classList.toggle('bt-led--off', !connected && !connecting);
+    }
+
+    const btn = document.getElementById('btn-bluetooth');
+    if (btn) btn.classList.toggle('active', connected);
   }
 
   /** Programmatically select a finish (e.g., from RFID) */

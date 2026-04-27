@@ -3,6 +3,7 @@ import {
   Mesh,
   MeshPhysicalMaterial,
   MeshStandardMaterial,
+  Color,
 } from 'three';
 import { FinishPreset, FINISHES } from './FinishLibrary';
 
@@ -73,9 +74,20 @@ export class MaterialSwapper {
           metalness: finish.metalness,
           roughness: finish.roughness,
           envMapIntensity: finish.envMapIntensity,
+          // Clearcoat — lacquer layer with its own specular lobe
           clearcoat: finish.clearcoat,
           clearcoatRoughness: finish.clearcoatRoughness,
-          // Preserve original normal map for surface detail
+          // Anisotropy — directional highlight for brushed metals
+          anisotropy: finish.anisotropy ?? 0,
+          anisotropyRotation: finish.anisotropyRotation ?? 0,
+          // Iridescence — angular colour shift (copper, gold, chrome)
+          iridescence: finish.iridescence ?? 0,
+          iridescenceIOR: finish.iridescenceIOR ?? 1.5,
+          // Sheen — micro-fibre scattering on matte surfaces
+          sheen: finish.sheen ?? 0,
+          sheenRoughness: finish.sheenRoughness ?? 1.0,
+          sheenColor: finish.sheenColor ?? new Color(0x000000),
+          // Preserve original normal map for surface micro-detail
           normalMap: mat.normalMap,
           normalScale: mat.normalScale.clone(),
         });

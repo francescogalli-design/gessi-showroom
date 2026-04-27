@@ -13,7 +13,9 @@ import { MODELS } from './utils/AssetManifest';
 import { UIOverlay } from './ui/UIOverlay';
 import { LoadingScreen } from './ui/LoadingScreen';
 import { DustParticles } from './scene/DustParticles';
+import type { DayNightPreset } from './scene/LightingRig';
 import { RfidService } from './services/RfidService';
+import { BluetoothNFCService } from './services/BluetoothNFCService';
 import './styles/main.css';
 
 class App {
@@ -29,6 +31,10 @@ class App {
   private loadingScreen!: LoadingScreen;
   private dustParticles!: DustParticles;
   private rfidService: RfidService | null = null;
+  private bluetoothNFC: BluetoothNFCService | null = null;
+  private lightingRig!: LightingRig;
+  private dayNightCycle: DayNightPreset[] = ['day', 'golden', 'night'];
+  private dayNightIndex = 0;
   private clock = 0;
   private lastTime = performance.now();
 
@@ -69,16 +75,22 @@ class App {
     this.environmentManager.onEnvironmentChange = (preset) => {
       const isLight = !!preset.lightMode;
       if (preset.showAsBackground) {
-        this.showroom.setVisible(false);
+        // Villa — glass floor only, HDRI is the background
+        this.showroom.setVisible(true);
+        this.showroom.setMode('villa');
+        // Interior loft: warm exposure, slight bokeh, environment intensity boost
+        this.renderer.instance.toneMappingExposure = 1.1;
+        this.scene.environmentIntensity = 0.55;
+        this.postProcessing.setBokeh(0.6);
+        if (this.ui) this.ui.setTheme(false);
       } else {
         this.showroom.setVisible(true);
         this.showroom.setMode(isLight ? 'light' : 'dark');
+        // Exposure + DOF: light mode needs more contrast, less bokeh haze
+        this.renderer.instance.toneMappingExposure = isLight ? 1.3 : 0.8;
+        this.postProcessing.setBokeh(isLight ? 0.0 : 1.2);
+        if (this.ui) this.ui.setTheme(isLight);
       }
-      // Exposure + DOF: light mode needs more contrast, less bokeh haze
-      this.renderer.instance.toneMappingExposure = isLight ? 1.3 : 0.8;
-      this.postProcessing.setBokeh(isLight ? 0.0 : 1.2);
-      // Sync UI theme
-      if (this.ui) this.ui.setTheme(isLight);
     };
 
     // Load and apply the studio environment first
@@ -94,10 +106,10 @@ class App {
     this.loadingScreen.setProgress(35, 'Loading lighting...');
 
     // Lighting
-    new LightingRig(this.scene);
+    this.lightingRig = new LightingRig(this.scene);
 
-    // Atmospheric dust particles
-    this.dustParticles = new DustParticles(this.scene, 80);
+    // Atmospheric dust particles — two-layer system (macro motes + micro haze)
+    this.dustParticles = new DustParticles(this.scene, 200);
 
 
     // Materials
@@ -128,6 +140,8 @@ class App {
       onAutoRotateToggle: (enabled) => this.cameraController.setAutoRotate(enabled),
       onScreenshot: () => this.takeScreenshot(),
       onFullscreen: () => this.toggleFullscreen(),
+      onBluetoothConnect: () => this.connectBluetooth(),
+      onDayNightCycle: () => this.cycleDayNight(),
     });
 
     this.modelManager.onModelChange = (entry) => {
@@ -211,6 +225,71 @@ class App {
     } else {
       document.exitFullscreen();
       document.body.classList.remove('fullscreen');
+    }
+  }
+
+  private cycleDayNight() {
+    const labels: Record<string, string> = {
+      day: '☀️ Day',
+      golden: '🌅 Golden Hour',
+      night: '🌙 Night',
+    };
+    this.dayNightIndex = (this.dayNightIndex + 1) % this.dayNightCycle.length;
+    const preset = this.dayNightCycle[this.dayNightIndex];
+    this.lightingRig.setPreset(preset);
+
+    // Night mode → adjust renderer exposure + bokeh
+    if (preset === 'night') {
+      this.renderer.instance.toneMappingExposure = 0.65;
+      this.postProcessing.setBokeh(2.0);
+    } else if (preset === 'golden') {
+      this.renderer.instance.toneMappingExposure = 1.0;
+      this.postProcessing.setBokeh(1.4);
+    } else {
+      // Respect current light/dark environment setting
+      const isLight = !!this.environmentManager.getCurrentPreset()?.lightMode;
+      this.renderer.instance.toneMappingExposure = isLight ? 1.3 : 0.8;
+      this.postProcessing.setBokeh(isLight ? 0.0 : 1.2);
+    }
+
+    this.ui.showToast(labels[preset] ?? preset);
+  }
+
+  private async connectBluetooth() {
+    if (!this.bluetoothNFC) {
+      this.bluetoothNFC = new BluetoothNFCService();
+
+      this.bluetoothNFC.onConnectionChange = (connected) => {
+        this.ui.setRfidStatus(connected, connected ? 'NFC Connected' : 'NFC Ready', false);
+        if (connected) {
+          this.ui.showToast('Bluetooth NFC connected');
+        }
+      };
+
+      this.bluetoothNFC.onFinishDetected = (finishId) => {
+        const model = this.modelManager.getCurrentModel();
+        this.materialSwapper.setFinish(finishId, model);
+        const finish = FINISHES.find((f) => f.id === finishId);
+        if (finish) this.ui.showToast(`NFC → ${finish.name}`);
+      };
+
+      this.bluetoothNFC.onTagScanned = (uid, finishId) => {
+        if (!finishId) this.ui.showToast(`Unknown tag: ${uid}`);
+      };
+    }
+
+    // Show connecting state while browser BT picker is open
+    this.ui.setRfidStatus(false, 'Connecting…', true);
+
+    try {
+      await this.bluetoothNFC.connect();
+    } catch (err: any) {
+      // User cancelled the picker or BT unavailable
+      this.bluetoothNFC = null;
+      this.ui.setRfidStatus(false, 'NFC', false);
+      if (err?.name !== 'NotFoundError') {
+        this.ui.showToast('Bluetooth error: ' + (err?.message ?? err));
+      }
     }
   }
 

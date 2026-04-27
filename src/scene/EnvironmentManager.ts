@@ -39,7 +39,7 @@ export const ENVIRONMENTS: EnvironmentPreset[] = [
   {
     id: 'villa',
     name: 'Villa',
-    hdriPath: '/hdri/villa_1k.hdr',
+    hdriPath: '/hdri/venice_sunset_2k.hdr',
     showAsBackground: true,
   },
 ];
@@ -109,11 +109,11 @@ export class EnvironmentManager {
       this.scene.background = envMap;
       this.scene.environmentIntensity = 1.0;
     } else if (preset.lightMode) {
-      this.scene.background = new Color(0xfaf9f8);
-      this.scene.environmentIntensity = 0.12;
+      this.scene.background = new Color(0xffffff);
+      this.scene.environmentIntensity = 0.38;  // more env contribution for richer light-mode reflections
     } else {
-      this.scene.background = new Color(0x050505);
-      this.scene.environmentIntensity = 0.25;
+      this.scene.background = new Color(0x0a0806);
+      this.scene.environmentIntensity = 0.55;  // was 0.25 — much richer reflections on dark metals
     }
 
     this.onEnvironmentChange?.(preset);

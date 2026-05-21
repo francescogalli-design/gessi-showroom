@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>NFC Ambient System</title>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    margin: 0;
+    font-family: 'DM Sans', -apple-system, system-ui;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* 🌫 base neutra */
+    background: #0b0b0b;
+
+    transition: background 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+
+  /* subtle ambient overlay (no “palla”) */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.04), transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(255,255,255,0.03), transparent 45%);
+    pointer-events: none;
+  }
+
+  .wrap {
+    text-align: center;
+    z-index: 2;
+  }
+
+  button {
+    padding: 12px 18px;
+    border-radius: 14px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+
+    background: rgba(255,255,255,0.95);
+    color: black;
+
+    transition: 0.2s ease;
+  }
+
+  button:hover {
+    transform: scale(1.03);
+  }
+
+  /* 🧊 glass card più Apple */
+  .card {
+    margin-top: 22px;
+    width: 360px;
+
+    padding: 24px;
+    border-radius: 22px;
+
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    border: 1px solid rgba(255,255,255,0.10);
+
+    /* ❌ niente shadow pesante */
+    box-shadow: none;
+
+    transition: all 0.6s ease;
+  }
+
+  .label {
+    font-size: 12px;
+    opacity: 0.55;
+    color: white;
+    letter-spacing: 0.2px;
+  }
+
+  .uid {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 8px;
+    word-break: break-all;
+    color: rgba(255,255,255,0.92);
+  }
+
+  .time {
+    margin-top: 10px;
+    font-size: 12px;
+    opacity: 0.45;
+    color: white;
+  }
+
+  /* ✨ micro feedback */
+  .pulse {
+    animation: pulse 0.6s ease;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.015); }
+    100% { transform: scale(1); }
+  }
+
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+  <button onclick="connect()">🔗 Connect NFC</button>
+
+  <div id="card" class="card">
+    <div class="label">TAG NFC</div>
+    <div id="uid" class="uid">—</div>
+    <div id="time" class="time">in attesa...</div>
+  </div>
+</div>
+
+<script>
+let characteristic;
+let lastUID = null;
+
+const tagColors = {
+  "04-7B-AF-6F-B3-2A-81": ["#34eb64", "#0b0b0b"],
+  "04-7A-AF-6F-B3-2A-81": ["#343deb", "#0b0b0b"],
+  "04-71-AF-6F-B3-2A-81": ["#EC4899", "#0b0b0b"],
+  "04-7C-AF-6F-B3-2A-81": ["#10B981", "#0b0b0b"],
+  "default": ["#1a1a1a", "#0b0b0b"]
+};
+
+function getColors(uid) {
+  return tagColors[uid] || tagColors.default;
+}
+
+/* 🌫 gradient lineare soft (no “palla”) */
+function setBackground(color) {
+  const [accent] = getColors(color);
+
+  document.body.style.background = `
+    linear-gradient(
+      135deg,
+      ${accent}22 0%,
+      #0b0b0b 55%,
+      #0b0b0b 100%
+    )
+  `;
+}
+
+async function connect() {
+  const device = await navigator.bluetooth.requestDevice({
+    filters: [{ name: "NFC-Reader" }],
+    optionalServices: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"]
+  });
+
+  const server = await device.gatt.connect();
+  const service = await server.getPrimaryService("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
+
+  characteristic = await service.getCharacteristic("beb5483e-36e1-4688-b7f5-ea07361b26a8");
+
+  await characteristic.startNotifications();
+
+  characteristic.addEventListener("characteristicvaluechanged", (event) => {
+    const value = new TextDecoder().decode(event.target.value);
+
+    let uid = value;
+
+    try {
+      uid = JSON.parse(value).uid;
+    } catch (e) {}
+
+    updateUI(uid);
+  });
+
+  alert("Connected ✔️");
+}
+
+function updateUI(uid) {
+  const card = document.getElementById("card");
+  const uidEl = document.getElementById("uid");
+  const timeEl = document.getElementById("time");
+
+  uidEl.innerText = uid;
+  timeEl.innerText = "last update: " + new Date().toLocaleTimeString();
+
+  /* 🎨 ambient background */
+  setBackground(uid);
+
+  /* ✨ feedback solo su change */
+  if (uid !== lastUID) {
+    card.classList.remove("pulse");
+    void card.offsetWidth;
+    card.classList.add("pulse");
+
+    lastUID = uid;
+  }
+}
+</script>
+
+</body>
+</html>

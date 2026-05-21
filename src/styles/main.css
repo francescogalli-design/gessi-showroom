@@ -281,6 +281,44 @@ canvas {
   display: inline-block;
 }
 
+/* ============================================
+   VERSION BADGE — bottom right, aligned with UI
+   ============================================ */
+
+.version-badge {
+  position: absolute;
+  bottom: 3.875rem;
+  right: 2rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s var(--transition-smooth);
+}
+
+.version-badge.visible {
+  opacity: 1;
+}
+
+.version-text {
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 0.55rem;
+  font-weight: 500;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.60);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 0.40rem 0.90rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+body.theme-light .version-text {
+  color: #000000;
+  background: rgba(255, 255, 255, 0.70);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
 /* Top Actions */
 .top-actions {
   display: flex;
@@ -393,7 +431,7 @@ canvas {
 
 .model-info {
   position: absolute;
-  bottom: 2.75rem;
+  bottom: 3.875rem;
   left: 2.25rem;
   max-width: 300px;
 }
@@ -764,7 +802,7 @@ canvas {
 
 .bottom-controls {
   position: absolute;
-  bottom: 2rem;
+  bottom: 3.875rem;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -914,7 +952,7 @@ canvas {
 
 .rfid-indicator {
   position: absolute;
-  bottom: 2.5rem;
+  bottom: 3.875rem;
   right: 2rem;
   display: flex;
   align-items: center;
@@ -1242,7 +1280,7 @@ body.ui-hidden .visitor-bar {
 
 .visitor-bar {
   position: absolute;
-  bottom: 2.2rem;
+  bottom: 3.875rem;
   left: 50%;
   transform: translateX(-50%);
   display: flex;

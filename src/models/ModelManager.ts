@@ -30,59 +30,74 @@ export class ModelManager {
 
   async switchModel(entryId: string) {
     const entry = MODELS.find((m) => m.id === entryId);
-    if (!entry) return;
+    if (!entry || entry.id === this.currentEntry?.id) return;
 
     const gltf = this.gltfCache.get(entry.id);
     if (!gltf) return;
 
-    // Fade out current model
-    if (this.currentModel) {
-      const oldModel = this.currentModel;
-      gsap.to(oldModel.scale, {
-        x: 0.9,
-        y: 0.9,
-        z: 0.9,
-        duration: 0.3,
+    const oldModel = this.currentModel;
+
+    type MatEntry = { mat: any; origTransparent: boolean; origDepthWrite: boolean };
+
+    const collectMats = (group: Group): MatEntry[] => {
+      const entries: MatEntry[] = [];
+      group.traverse((child: any) => {
+        if (!child.isMesh || !child.material) return;
+        const rawMats: any[] = Array.isArray(child.material) ? child.material : [child.material];
+        const clonedMats = rawMats.map((m: any) => {
+          const entry: MatEntry = { mat: m.clone(), origTransparent: m.transparent, origDepthWrite: m.depthWrite };
+          entry.mat.transparent = true;
+          entry.mat.depthWrite = false;
+          entry.mat.needsUpdate = true;
+          entries.push(entry);
+          return entry.mat;
+        });
+        child.material = Array.isArray(child.material) ? clonedMats : clonedMats[0];
+      });
+      return entries;
+    };
+
+    // Fade out old model
+    if (oldModel) {
+      const oldEntries = collectMats(oldModel);
+      const out = { t: 1 };
+      gsap.to(out, {
+        t: 0,
+        duration: 0.38,
         ease: 'power2.in',
-        onComplete: () => {
-          this.scene.remove(oldModel);
-        },
+        onUpdate: () => oldEntries.forEach(({ mat }) => (mat.opacity = out.t)),
+        onComplete: () => { this.scene.remove(oldModel); },
       });
-      gsap.to(oldModel, {
-        duration: 0.3,
-        onUpdate: () => {
-          oldModel.traverse((child) => {
-            if ((child as any).isMesh && (child as any).material) {
-              const mat = (child as any).material;
-              if (mat.transparent !== undefined) {
-                mat.transparent = true;
-                mat.opacity = Math.max(0, mat.opacity - 0.05);
-              }
-            }
-          });
-        },
-      });
+      gsap.to(oldModel.position, { y: 0.06, duration: 0.38, ease: 'power2.in' });
     }
 
-    // Clone the scene so we can reuse the cached original
+    // Prepare new model
     const newModel = gltf.scene.clone(true);
-
-    // Apply current finish
     this.materialSwapper.applyCurrentFinish(newModel);
-
-    // Start small and transparent
-    newModel.scale.set(0.9, 0.9, 0.9);
+    const newEntries = collectMats(newModel);
+    newEntries.forEach(({ mat }) => (mat.opacity = 0));
+    newModel.position.y = -0.06;
     this.scene.add(newModel);
 
-    // Fade in
-    gsap.to(newModel.scale, {
-      x: 1,
-      y: 1,
-      z: 1,
-      duration: 0.5,
+    const delay = oldModel ? 0.18 : 0;
+    const into = { t: 0 };
+    gsap.to(into, {
+      t: 1,
+      duration: 0.65,
       ease: 'power2.out',
-      delay: 0.2,
+      delay,
+      onUpdate: () => newEntries.forEach(({ mat }) => (mat.opacity = into.t)),
+      onComplete: () => {
+        // Restore original material state after fade-in completes
+        newEntries.forEach(({ mat, origTransparent, origDepthWrite }) => {
+          mat.transparent = origTransparent;
+          mat.depthWrite = origDepthWrite;
+          mat.opacity = 1;
+          mat.needsUpdate = true;
+        });
+      },
     });
+    gsap.to(newModel.position, { y: 0, duration: 0.75, ease: 'power3.out', delay });
 
     this.currentModel = newModel;
     this.currentEntry = entry;

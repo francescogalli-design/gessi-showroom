@@ -96,7 +96,7 @@ export class ShowroomEnvironment {
       clipBias: 0.003,
       textureWidth: 1024,
       textureHeight: 1024,
-      color: new Color(0xa8a4a0),
+      color: new Color(0xc8c0b0),  // warmer ivory reflection tint
     });
     this.lightReflector.rotation.x = -Math.PI / 2;
     this.lightReflector.position.y = -0.001;
@@ -105,9 +105,9 @@ export class ShowroomEnvironment {
     this.lightOverlay = new Mesh(
       geo,
       new MeshBasicMaterial({
-        color: new Color(0xd8d4cf),
+        color: new Color(0xeae4da),  // warm ivory floor surface
         transparent: true,
-        opacity: 0.92,
+        opacity: 0.90,
         depthWrite: false,
       })
     );
@@ -185,9 +185,9 @@ export class ShowroomEnvironment {
     this.lightBackdropGroup = new Group();
 
     const mat = new MeshStandardMaterial({
-      color: new Color(0xffffff),
+      color: new Color(0xf5f0e8),  // warm ivory backdrop
       roughness: 1.0, metalness: 0.0,
-      side: DoubleSide, envMapIntensity: 0.08,
+      side: DoubleSide, envMapIntensity: 0.06,
     });
     const backdrop = new Mesh(
       new CylinderGeometry(2.0, 2.0, 1.5, 80, 1, true, 0, Math.PI * 2), mat
@@ -197,9 +197,9 @@ export class ShowroomEnvironment {
     this.lightBackdropGroup.add(backdrop);
 
     const coveMat = new MeshStandardMaterial({
-      color: new Color(0xfafafa),
+      color: new Color(0xf0ebe2),  // slightly warmer cove transition
       roughness: 1.0, metalness: 0.0,
-      side: DoubleSide, envMapIntensity: 0.08,
+      side: DoubleSide, envMapIntensity: 0.06,
     });
     const cove = new Mesh(
       new LatheGeometry(this.buildCoveProfile(), 80, 0, Math.PI * 2), coveMat

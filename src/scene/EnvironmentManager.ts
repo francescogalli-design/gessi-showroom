@@ -19,7 +19,7 @@ export interface EnvironmentPreset {
 export const ENVIRONMENTS: EnvironmentPreset[] = [
   {
     id: 'studio',
-    name: 'Studio Dark',
+    name: 'Studio',
     hdriPath: '/hdri/studio_small_09_1k.hdr',
     showAsBackground: false,
   },
@@ -27,6 +27,13 @@ export const ENVIRONMENTS: EnvironmentPreset[] = [
     id: 'studio-light',
     name: 'Studio Light',
     hdriPath: '/hdri/studio_small_09_1k.hdr',
+    showAsBackground: false,
+    lightMode: true,
+  },
+  {
+    id: 'loft',
+    name: 'Loft',
+    hdriPath: '/hdri/loft_hall_1k.hdr',
     showAsBackground: false,
     lightMode: true,
   },
@@ -39,7 +46,7 @@ export const ENVIRONMENTS: EnvironmentPreset[] = [
   {
     id: 'villa',
     name: 'Villa',
-    hdriPath: '/hdri/venice_sunset_2k.hdr',
+    hdriPath: '/hdri/venice_sunset_16k.hdr',
     showAsBackground: true,
   },
 ];
@@ -109,8 +116,8 @@ export class EnvironmentManager {
       this.scene.background = envMap;
       this.scene.environmentIntensity = 1.0;
     } else if (preset.lightMode) {
-      this.scene.background = new Color(0xffffff);
-      this.scene.environmentIntensity = 0.38;  // more env contribution for richer light-mode reflections
+      this.scene.background = new Color(0xf5f0e8);  // warm ivory — more luxury than pure white
+      this.scene.environmentIntensity = 0.42;
     } else {
       this.scene.background = new Color(0x0a0806);
       this.scene.environmentIntensity = 0.55;  // was 0.25 — much richer reflections on dark metals

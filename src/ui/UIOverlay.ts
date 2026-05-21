@@ -25,6 +25,7 @@ export class UIOverlay {
   private finishBadgeName!: HTMLElement;
   private finishBadgeDot!: HTMLElement;
   private vbarName!: HTMLElement;
+  private versionBadge!: HTMLElement;
   // Elements toggled by GSAP between visitor and admin mode
   private elTopBar!: HTMLElement;
   private elModelInfo!: HTMLElement;
@@ -50,10 +51,7 @@ export class UIOverlay {
       <div class="top-bar">
         <div class="brand-container">
           <img src="/asset/logo.svg" alt="GESSI" class="brand-logo" />
-          <div class="brand-sub">
-            Virtual Showroom
-            <span class="beta-tag">BETA</span>
-          </div>
+          <div class="brand-sub">Virtual Showroom</div>
         </div>
         <div class="top-actions">
           <button class="action-btn" id="btn-daynightcycle" title="Day / Golden Hour / Night">
@@ -178,6 +176,10 @@ export class UIOverlay {
         <span class="rfid-label" id="rfid-label">NFC</span>
       </div>
 
+      <div class="version-badge">
+        <span class="version-text">BETA v0.5.2</span>
+      </div>
+
       <div class="kbd-hint">
         <div class="kbd-item"><span class="kbd-key">R</span><span class="kbd-desc">Rotate</span></div>
         <div class="kbd-item"><span class="kbd-key">S</span><span class="kbd-desc">Screenshot</span></div>
@@ -214,6 +216,7 @@ export class UIOverlay {
     this.finishBadgeName = document.getElementById('finish-badge-name')!;
     this.finishBadgeDot = document.getElementById('finish-badge-dot')!;
     this.vbarName = document.getElementById('vbar-name')!;
+    this.versionBadge = this.overlay.querySelector('.version-badge')!;
     this.elTopBar = this.overlay.querySelector('.top-bar')!;
     this.elModelInfo = this.overlay.querySelector('.model-info')!;
     this.elBottomControls = this.overlay.querySelector('.bottom-controls')!;
@@ -517,5 +520,8 @@ export class UIOverlay {
     gsap.set(this.elBottomControls, { opacity: 0, y: 6 });
     gsap.set(this.elKbdHint, { opacity: 0 });
     gsap.set(this.elVisitorBar, { opacity: 1 });
+
+    // Show version badge
+    this.versionBadge.classList.add('visible');
   }
 }

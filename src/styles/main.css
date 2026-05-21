@@ -77,7 +77,7 @@ body.theme-light .bottom-controls {
   border-color: rgba(0, 0, 0, 0.07);
 }
 body.theme-light .finish-dot {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  box-shadow: none;
 }
 body.theme-light .model-dot {
   color: rgba(26, 22, 18, 0.50);
@@ -268,6 +268,19 @@ canvas {
   margin-top: 7px;
 }
 
+.beta-tag {
+  font-size: 0.38rem;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(180, 154, 110, 0.12);
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  margin-left: 0.5rem;
+  display: inline-block;
+}
+
 /* Top Actions */
 .top-actions {
   display: flex;
@@ -314,17 +327,17 @@ canvas {
   bottom: -26px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 0.45rem;
-  font-weight: 300;
+  font-size: 0.55rem;
+  font-weight: 400;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: #ffffff;
   white-space: nowrap;
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;
-  background: rgba(8, 6, 4, 0.80);
-  padding: 3px 8px;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 4px 10px;
   border-radius: 4px;
 }
 
@@ -574,7 +587,7 @@ canvas {
   transition: all 0.3s var(--transition-smooth);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  box-shadow: none;
 }
 
 .finish-swatch::after {
@@ -596,7 +609,7 @@ canvas {
 
 .finish-option.active .finish-swatch {
   border-color: var(--gold);
-  box-shadow: 0 0 0 3px var(--gold-glow), 0 2px 10px rgba(0,0,0,0.5);
+  box-shadow: none;
 }
 
 .finish-label {
@@ -663,7 +676,7 @@ canvas {
 
 .scene-btn.active .scene-icon {
   opacity: 1;
-  box-shadow: 0 0 5px currentColor;
+  box-shadow: none;
 }
 
 /* Camera Presets */
@@ -736,7 +749,7 @@ canvas {
   background: var(--gold);
   cursor: pointer;
   border: none;
-  box-shadow: 0 0 8px rgba(180, 154, 110, 0.35);
+  box-shadow: none;
   transition: transform 0.2s ease;
 }
 
@@ -774,11 +787,11 @@ canvas {
   border: 2px solid transparent;
   background: var(--swatch, #ccc);
   cursor: pointer;
-  transition: transform 0.25s var(--transition-spring), border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s var(--transition-spring), border-color 0.25s ease;
   position: relative;
   flex-shrink: 0;
   outline: none;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.55);
+  box-shadow: none;
 }
 
 .finish-dot::after {
@@ -796,12 +809,12 @@ canvas {
 
 .finish-dot:hover {
   transform: scale(1.12) translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.60);
+  box-shadow: none;
 }
 
 .finish-dot.active {
   border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(180, 154, 110, 0.22), 0 4px 14px rgba(0,0,0,0.55);
+  box-shadow: none;
   transform: scale(1.06);
 }
 
@@ -810,17 +823,17 @@ canvas {
   top: -30px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 0.44rem;
-  font-weight: 300;
+  font-size: 0.55rem;
+  font-weight: 400;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: #ffffff;
   white-space: nowrap;
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;
-  background: rgba(8, 6, 4, 0.82);
-  padding: 3px 8px;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 4px 10px;
   border-radius: 4px;
 }
 
@@ -877,17 +890,17 @@ canvas {
   top: -30px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 0.44rem;
-  font-weight: 300;
+  font-size: 0.55rem;
+  font-weight: 400;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: #ffffff;
   white-space: nowrap;
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;
-  background: rgba(8, 6, 4, 0.82);
-  padding: 3px 8px;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 4px 10px;
   border-radius: 4px;
 }
 
@@ -935,7 +948,7 @@ canvas {
 
 .rfid-indicator.connected .rfid-dot {
   background: #50c878;
-  box-shadow: 0 0 7px rgba(80, 200, 120, 0.4);
+  box-shadow: none;
   animation: rfid-pulse 2s ease-in-out infinite;
 }
 
@@ -963,7 +976,7 @@ canvas {
 
 .rfid-indicator.connecting .rfid-dot {
   background: #507fff;
-  box-shadow: 0 0 7px rgba(80, 140, 255, 0.5);
+  box-shadow: none;
   animation: rfid-pulse 0.8s ease-in-out infinite;
 }
 
@@ -987,19 +1000,19 @@ canvas {
   height: 5px;
   border-radius: 50%;
   background: transparent;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
+  transition: background 0.3s ease;
   pointer-events: none;
 }
 
 .bt-led--connecting {
   background: #507fff;
-  box-shadow: 0 0 5px rgba(80, 140, 255, 0.7);
+  box-shadow: none;
   animation: rfid-pulse 0.8s ease-in-out infinite;
 }
 
 .bt-led--connected {
   background: #50c878;
-  box-shadow: 0 0 5px rgba(80, 200, 120, 0.6);
+  box-shadow: none;
   animation: rfid-pulse 2s ease-in-out infinite;
 }
 
@@ -1067,9 +1080,7 @@ canvas {
   transition: opacity 0.5s ease 2.5s;
 }
 
-#ui-overlay.visible .kbd-hint {
-  opacity: 1;
-}
+/* kbd-hint opacity managed by GSAP in UIOverlay.ts */
 
 .kbd-item {
   display: flex;
@@ -1203,5 +1214,251 @@ body.fullscreen .side-panel.open {
 
   .finish-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ============================================
+   VISITOR / ADMIN MODE
+   Opacity + transform animated by GSAP (UIOverlay.ts).
+   Only pointer-events managed here (no transition needed).
+   ============================================ */
+
+body.visitor-mode .top-bar,
+body.visitor-mode .model-info,
+body.visitor-mode .bottom-controls,
+body.visitor-mode .kbd-hint {
+  pointer-events: none;
+}
+
+/* ui-hidden hides everything including visitor bar */
+body.ui-hidden .visitor-bar {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ============================================
+   VISITOR BAR — iOS 26 Liquid Glass
+   ============================================ */
+
+.visitor-bar {
+  position: absolute;
+  bottom: 2.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.55s var(--transition-smooth),
+              transform 0.55s var(--transition-smooth);
+  z-index: 20;
+}
+
+.visitor-bar > * {
+  pointer-events: auto;
+}
+
+/* Model name above the pill */
+.vbar-model {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.18rem;
+  pointer-events: none;
+}
+
+.vbar-collection {
+  font-size: 0.42rem;
+  font-weight: 300;
+  letter-spacing: 0.30em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+
+.vbar-name {
+  font-size: 1.10rem;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  line-height: 1.1;
+  text-align: center;
+  transition: opacity 0.35s var(--transition-smooth);
+}
+
+/* The glass pill */
+.vbar-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 1.30rem;
+
+  /* iOS 26 Liquid Glass — dark */
+  background: rgba(12, 9, 7, 0.52);
+  backdrop-filter: blur(52px) saturate(1.7) brightness(1.08);
+  -webkit-backdrop-filter: blur(52px) saturate(1.7) brightness(1.08);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 100px;
+  box-shadow: none;
+}
+
+/* Light theme pill */
+body.theme-light .vbar-pill {
+  background: rgba(255, 255, 255, 0.46);
+  border-color: rgba(255, 255, 255, 0.62);
+  box-shadow: none;
+}
+
+/* Finish swatches in visitor pill */
+.vbar-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: var(--sw, #ccc);
+  cursor: pointer;
+  flex-shrink: 0;
+  outline: none;
+  position: relative;
+  box-shadow: none;
+  transition: transform 0.24s var(--transition-spring),
+              border-color 0.22s ease;
+}
+
+.vbar-swatch::after {
+  content: '';
+  position: absolute;
+  top: 14%;
+  left: 18%;
+  width: 48%;
+  height: 28%;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.vbar-swatch:hover {
+  transform: scale(1.14) translateY(-2px);
+  box-shadow: none;
+}
+
+.vbar-swatch.active {
+  border-color: var(--gold);
+  box-shadow: none;
+  transform: scale(1.08);
+}
+
+.vbar-tooltip {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.55rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffffff;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.vbar-swatch:hover .vbar-tooltip {
+  opacity: 1;
+}
+
+body.theme-light .vbar-tooltip {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+/* Separator */
+.vbar-sep {
+  width: 1px;
+  height: 18px;
+  background: rgba(235, 228, 215, 0.14);
+  flex-shrink: 0;
+  margin: 0 0.1rem;
+}
+
+body.theme-light .vbar-sep {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+/* Scene buttons in visitor pill */
+.vbar-scene-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.48rem;
+  font-weight: 300;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(235, 228, 215, 0.52);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.22rem 0.55rem;
+  border-radius: 100px;
+  transition: color 0.22s ease, background 0.22s ease;
+  white-space: nowrap;
+}
+
+.vbar-scene-btn:hover {
+  color: var(--text-primary);
+  background: rgba(235, 228, 215, 0.07);
+}
+
+.vbar-scene-btn.active {
+  color: var(--gold);
+  background: rgba(180, 154, 110, 0.10);
+}
+
+body.theme-light .vbar-scene-btn {
+  color: rgba(26, 22, 18, 0.48);
+}
+
+body.theme-light .vbar-scene-btn:hover {
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+body.theme-light .vbar-scene-btn.active {
+  color: var(--gold);
+  background: rgba(138, 107, 32, 0.08);
+}
+
+/* Light theme model name in visitor bar */
+body.theme-light .vbar-name {
+  color: var(--text-primary);
+}
+
+body.theme-light .vbar-collection {
+  color: var(--gold-dim);
+}
+
+/* Mobile visitor bar */
+@media (max-width: 768px) {
+  .visitor-bar {
+    bottom: 1.5rem;
+    gap: 0.7rem;
+  }
+  .vbar-name {
+    font-size: 0.92rem;
+  }
+  .vbar-pill {
+    gap: 0.42rem;
+    padding: 0.55rem 1.0rem;
+  }
+  .vbar-swatch {
+    width: 22px;
+    height: 22px;
+  }
+  .vbar-scene-btn {
+    font-size: 0.42rem;
+    padding: 0.18rem 0.40rem;
   }
 }

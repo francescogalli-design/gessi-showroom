@@ -1,3 +1,4 @@
+import gsap from 'gsap';
 import { MODELS, ModelEntry } from '../utils/AssetManifest';
 import { FINISHES, FinishPreset } from '../materials/FinishLibrary';
 import { ENVIRONMENTS, EnvironmentPreset } from '../scene/EnvironmentManager';
@@ -23,8 +24,16 @@ export class UIOverlay {
   private modelInfoSku!: HTMLElement;
   private finishBadgeName!: HTMLElement;
   private finishBadgeDot!: HTMLElement;
+  private vbarName!: HTMLElement;
+  // Elements toggled by GSAP between visitor and admin mode
+  private elTopBar!: HTMLElement;
+  private elModelInfo!: HTMLElement;
+  private elBottomControls!: HTMLElement;
+  private elKbdHint!: HTMLElement;
+  private elVisitorBar!: HTMLElement;
   private panelOpen = false;
   private autoRotate = true;
+  private adminMode = false;
   private currentModelId = MODELS[0].id;
   private currentFinishId = FINISHES[0].id;
   private exposureValue = 1.0;
@@ -41,7 +50,10 @@ export class UIOverlay {
       <div class="top-bar">
         <div class="brand-container">
           <img src="/asset/logo.svg" alt="GESSI" class="brand-logo" />
-          <div class="brand-sub">Virtual Showroom</div>
+          <div class="brand-sub">
+            Virtual Showroom
+            <span class="beta-tag">BETA</span>
+          </div>
         </div>
         <div class="top-actions">
           <button class="action-btn" id="btn-daynightcycle" title="Day / Golden Hour / Night">
@@ -173,6 +185,26 @@ export class UIOverlay {
         <div class="kbd-item"><span class="kbd-key">P</span><span class="kbd-desc">Panel</span></div>
         <div class="kbd-item"><span class="kbd-key">H</span><span class="kbd-desc">Hide UI</span></div>
         <div class="kbd-item"><span class="kbd-key">N</span><span class="kbd-desc">Night Cycle</span></div>
+        <div class="kbd-item"><span class="kbd-key">\\</span><span class="kbd-desc">Visitor Mode</span></div>
+      </div>
+
+      <!-- ═══ VISITOR BAR — default minimal presentation mode ═══ -->
+      <div class="visitor-bar" id="visitor-bar">
+        <div class="vbar-model">
+          <span class="vbar-collection">Perle Collection</span>
+          <span class="vbar-name" id="vbar-name">${MODELS[0].name}</span>
+        </div>
+        <div class="vbar-pill">
+          ${FINISHES.map(
+            (f, i) =>
+              `<button class="vbar-swatch ${i === 0 ? 'active' : ''}" data-vfinish="${f.id}" style="--sw:${f.swatchColor}"><span class="vbar-tooltip">${f.name}</span></button>`
+          ).join('')}
+          <div class="vbar-sep"></div>
+          ${ENVIRONMENTS.map(
+            (e, i) =>
+              `<button class="vbar-scene-btn ${i === 1 ? 'active' : ''}" data-venv="${e.id}">${e.name}</button>`
+          ).join('')}
+        </div>
       </div>
     `;
 
@@ -181,6 +213,12 @@ export class UIOverlay {
     this.modelInfoSku = document.getElementById('model-sku')!;
     this.finishBadgeName = document.getElementById('finish-badge-name')!;
     this.finishBadgeDot = document.getElementById('finish-badge-dot')!;
+    this.vbarName = document.getElementById('vbar-name')!;
+    this.elTopBar = this.overlay.querySelector('.top-bar')!;
+    this.elModelInfo = this.overlay.querySelector('.model-info')!;
+    this.elBottomControls = this.overlay.querySelector('.bottom-controls')!;
+    this.elKbdHint = this.overlay.querySelector('.kbd-hint')!;
+    this.elVisitorBar = document.getElementById('visitor-bar')!;
 
     this.bindEvents();
   }
@@ -251,12 +289,37 @@ export class UIOverlay {
       });
     });
 
-    // Scene buttons
+    // Scene buttons (admin panel)
     this.overlay.querySelectorAll('.scene-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
+        const envId = (btn as HTMLElement).dataset.env!;
         this.overlay.querySelectorAll('.scene-btn').forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
-        this.callbacks.onEnvironmentSelect((btn as HTMLElement).dataset.env!);
+        this.overlay.querySelectorAll('.vbar-scene-btn').forEach((b) => {
+          b.classList.toggle('active', (b as HTMLElement).dataset.venv === envId);
+        });
+        this.callbacks.onEnvironmentSelect(envId);
+      });
+    });
+
+    // Visitor bar — finish swatches
+    this.overlay.querySelectorAll('.vbar-swatch').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.vfinish!;
+        this.selectFinish(id);
+      });
+    });
+
+    // Visitor bar — scene buttons
+    this.overlay.querySelectorAll('.vbar-scene-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const envId = (btn as HTMLElement).dataset.venv!;
+        this.overlay.querySelectorAll('.vbar-scene-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.overlay.querySelectorAll('.scene-btn').forEach((b) => {
+          b.classList.toggle('active', (b as HTMLElement).dataset.env === envId);
+        });
+        this.callbacks.onEnvironmentSelect(envId);
       });
     });
 
@@ -300,6 +363,9 @@ export class UIOverlay {
     this.overlay.querySelectorAll('.finish-dot').forEach((b) => {
       b.classList.toggle('active', (b as HTMLElement).dataset.quickFinish === id);
     });
+    this.overlay.querySelectorAll('.vbar-swatch').forEach((b) => {
+      b.classList.toggle('active', (b as HTMLElement).dataset.vfinish === id);
+    });
     this.callbacks.onFinishSelect(id);
   }
 
@@ -307,6 +373,31 @@ export class UIOverlay {
     this.panelOpen = !this.panelOpen;
     document.getElementById('side-panel')!.classList.toggle('open', this.panelOpen);
     document.getElementById('btn-panel')!.classList.toggle('active', this.panelOpen);
+  }
+
+  private toggleAdminMode() {
+    this.adminMode = !this.adminMode;
+    document.body.classList.toggle('visitor-mode', !this.adminMode);
+
+    const adminEls = [this.elTopBar, this.elModelInfo, this.elBottomControls];
+
+    if (this.adminMode) {
+      // Entering admin: fade visitor bar out, slide admin elements in
+      gsap.to(this.elVisitorBar, { opacity: 0, duration: 0.28, ease: 'power2.in' });
+      gsap.to(this.elTopBar, { opacity: 1, y: 0, duration: 0.48, delay: 0.08, ease: 'power2.out' });
+      gsap.to(this.elModelInfo, { opacity: 1, y: 0, duration: 0.48, delay: 0.13, ease: 'power2.out' });
+      gsap.to(this.elBottomControls, { opacity: 1, y: 0, duration: 0.48, delay: 0.18, ease: 'power2.out' });
+      gsap.to(this.elKbdHint, { opacity: 1, duration: 0.45, delay: 0.9, ease: 'power2.out' });
+    } else {
+      // Leaving admin: collapse panel, fade admin elements out, slide visitor bar in
+      if (this.panelOpen) this.togglePanel();
+      gsap.to(adminEls, { opacity: 0, duration: 0.32, ease: 'power2.in' });
+      gsap.to(this.elKbdHint, { opacity: 0, duration: 0.22, ease: 'power2.in' });
+      gsap.to(this.elTopBar, { y: -8, duration: 0.32, ease: 'power2.in' });
+      gsap.to(this.elModelInfo, { y: 6, duration: 0.32, ease: 'power2.in' });
+      gsap.to(this.elBottomControls, { y: 6, duration: 0.32, ease: 'power2.in' });
+      gsap.to(this.elVisitorBar, { opacity: 1, duration: 0.5, delay: 0.22, ease: 'power2.out' });
+    }
   }
 
   private bindKeyboard() {
@@ -339,11 +430,19 @@ export class UIOverlay {
           const idx = parseInt(e.key) - 1;
           if (idx < MODELS.length) this.selectModel(MODELS[idx].id);
           break;
+        case '\\':
+          if (!e.shiftKey) {
+            e.preventDefault();
+            this.toggleAdminMode();
+          }
+          break;
         case 'escape':
           if (document.body.classList.contains('ui-hidden')) {
             document.body.classList.remove('ui-hidden');
           } else if (this.panelOpen) {
             this.togglePanel();
+          } else if (this.adminMode) {
+            this.toggleAdminMode(); // back to visitor mode
           }
           break;
       }
@@ -354,6 +453,7 @@ export class UIOverlay {
     this.modelInfoName.textContent = entry.name;
     this.modelInfoCategory.textContent = entry.category;
     this.modelInfoSku.textContent = entry.id;
+    if (this.vbarName) this.vbarName.textContent = entry.name;
   }
 
   updateFinishInfo(finish: FinishPreset) {
@@ -409,5 +509,13 @@ export class UIOverlay {
 
   show() {
     this.overlay.classList.add('visible');
+    document.body.classList.add('visitor-mode');
+
+    // Set initial state via GSAP — bypasses any CSS cascade fights
+    gsap.set(this.elTopBar, { opacity: 0, y: -8 });
+    gsap.set(this.elModelInfo, { opacity: 0, y: 6 });
+    gsap.set(this.elBottomControls, { opacity: 0, y: 6 });
+    gsap.set(this.elKbdHint, { opacity: 0 });
+    gsap.set(this.elVisitorBar, { opacity: 1 });
   }
 }

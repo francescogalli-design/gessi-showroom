@@ -130,6 +130,12 @@ class App {
     // Show first model
     await this.modelManager.switchModel(MODELS[0].id);
 
+    // Force re-apply environment settings after model is loaded to ensure proper configuration
+    const currentEnv = this.environmentManager.getCurrentPreset();
+    if (currentEnv && this.environmentManager.onEnvironmentChange) {
+      this.environmentManager.onEnvironmentChange(currentEnv);
+    }
+
     // UI
     this.ui = new UIOverlay({
       onModelSelect: (id) => this.onModelSelect(id),
